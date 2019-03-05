@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(fly_vision)
+add_compile_options(-std=c++11)
 
 find_package(Boost REQUIRED COMPONENTS date_time thread)
 find_package(catkin REQUIRED COMPONENTS message_generation rostime roscpp rosconsole roscpp_serialization
