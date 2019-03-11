@@ -73,26 +73,24 @@ Mat add_id(int id,Mat frame){
     channel[0].setTo(cv::Scalar(255));
     channel[1].setTo(cv::Scalar(255));
     channel[2].setTo(cv::Scalar(255));
-    cv::Rect myroi=cv::Rect(4, 4, 16, 16);
-    cv::Rect idroi=cv::Rect(0, 0, 24, 24);
+    cv::Rect myroi = cv::Rect(4, 4, 16, 16);
+    cv::Rect idroi = cv::Rect(0, 0, 24, 24);
     
     int id_m=id/1000/1000;
     int id_k=id/1000-id_m*1000;
     int id_1=id%1000%1000;
     
     dictionary.drawMarker(id_1,16, markerImage, 1);
-	markerImage.copyTo(channel[0](myroi));
+    markerImage.copyTo(channel[0](myroi));
+    dictionary.drawMarker(id_k,16, markerImage, 1);
+    markerImage.copyTo(channel[1](myroi));
+    dictionary.drawMarker(id_m,16, markerImage, 1);
+    markerImage.copyTo(channel[2](myroi));
 	
-	dictionary.drawMarker(id_k,16, markerImage, 1);
-	markerImage.copyTo(channel[1](myroi));
-	
-	dictionary.drawMarker(id_m,16, markerImage, 1);
-	markerImage.copyTo(channel[2](myroi));
-	
-	Mat idmark;
-	merge(channel, idmark);
-	idmark.copyTo(frame(idroi));
-	return frame;
+    Mat idmark;
+    merge(channel, idmark);
+    idmark.copyTo(frame(idroi));
+    return frame;
 }
 
 
@@ -123,17 +121,17 @@ int main(int argc, char **argv)
             frame = camImageCopy_.clone();
         }
 
-		//添加ID到照片左上角
-		frame=add_id(id,frame);
-		// 设置图像帧格式->bgr8
-		idmsg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
-       	// 将图像通过话题发布出
-       	image_pub.publish(idmsg); 
+        //添加ID到照片左上角
+        frame=add_id(id,frame);
+        // 设置图像帧格式->bgr8
+        idmsg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
+        // 将图像通过话题发布出
+        image_pub.publish(idmsg); 
        	if( getImageStatus() )  id = id+1;
-		printf("The ID what I have send is=%d\n",id);
+        printf("The ID what I have send is=%d\n",id);
 		
-		imshow("add_id", frame);
-		waitKey(5);
+        imshow("add_id", frame);
+        waitKey(5);
         
         ros::spinOnce();
         loop_rate.sleep();
