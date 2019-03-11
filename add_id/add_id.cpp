@@ -14,8 +14,6 @@
 using namespace std;
 using namespace cv;
 
-
-
 image_transport::Subscriber imageSubscriber_;
 
 int frameWidth_;
@@ -62,7 +60,7 @@ void cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 
 
 
-Mat add_id(int id,Mat frame){
+Mat add_id(int id, Mat frame){
     cv::Mat markerImage; 
     vector<Mat> channel(3);
     cv::aruco::Dictionary dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
@@ -76,15 +74,15 @@ Mat add_id(int id,Mat frame){
     cv::Rect myroi = cv::Rect(4, 4, 16, 16);
     cv::Rect idroi = cv::Rect(0, 0, 24, 24);
     
-    int id_m=id/1000/1000;
-    int id_k=id/1000-id_m*1000;
-    int id_1=id%1000%1000;
+    int id_m = id/1000/1000;
+    int id_k = id/1000-id_m*1000;
+    int id_1 = id%1000%1000;
     
-    dictionary.drawMarker(id_1,16, markerImage, 1);
+    dictionary.drawMarker(id_1, 16, markerImage, 1);
     markerImage.copyTo(channel[0](myroi));
-    dictionary.drawMarker(id_k,16, markerImage, 1);
+    dictionary.drawMarker(id_k, 16, markerImage, 1);
     markerImage.copyTo(channel[1](myroi));
-    dictionary.drawMarker(id_m,16, markerImage, 1);
+    dictionary.drawMarker(id_m, 16, markerImage, 1);
     markerImage.copyTo(channel[2](myroi));
 	
     Mat idmark;
@@ -122,14 +120,14 @@ int main(int argc, char **argv)
         }
 
         //添加ID到照片左上角
-        frame=add_id(id,frame);
+        frame = add_id(id,frame);
         // 设置图像帧格式->bgr8
         idmsg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
         // 将图像通过话题发布出
         image_pub.publish(idmsg); 
        	if( getImageStatus() )  id = id+1;
-        printf("The ID what I have send is=%d\n",id);
-		
+        printf("The ID what I have send is=%d\n", id);
+		 
         imshow("add_id", frame);
         waitKey(5);
         

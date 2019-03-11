@@ -54,12 +54,12 @@ void cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 
     if (cam_image) {
         {
-        boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
-        camImageCopy_ = cam_image->image.clone();
+            boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
+            camImageCopy_ = cam_image->image.clone();
         }
         {
-        boost::unique_lock<boost::shared_mutex> lockImageStatus(mutexImageStatus_);
-        imageStatus_ = true;
+            boost::unique_lock<boost::shared_mutex> lockImageStatus(mutexImageStatus_);
+            imageStatus_ = true;
         }
         frameWidth_ = cam_image->image.size().width;
         frameHeight_ = cam_image->image.size().height;
@@ -69,39 +69,39 @@ void cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 
 //读取照片中的ID，如果返回值是-1，则读取失败
 int read_id(Mat frame){
-	int id;
-	Mat idmark;
-	vector<Mat> channel(3);
-	Ptr<aruco::Dictionary> dictionary = aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
-	cv::Rect idroi=cv::Rect(0, 0,24,24);
-	frame(idroi).copyTo(idmark);
-  	split(idmark, channel);
+    int id;
+    Mat idmark;
+    vector<Mat> channel(3);
+    Ptr<aruco::Dictionary> dictionary = aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
+    cv::Rect idroi = cv::Rect(0, 0, 24, 24);
+    frame(idroi).copyTo(idmark);
+    split(idmark, channel);
 
-	vector< int > id_1;
-	vector< int > id_k;
-	vector< int > id_m;
-	vector< vector<Point2f> > markerCorners;
-	cv::aruco::detectMarkers(channel[0], dictionary, markerCorners, id_1);
-	if(id_1.size()>0) {
-		cv::aruco::detectMarkers(channel[1], dictionary, markerCorners, id_k);
-		if(id_k.size()>0) {
-			cv::aruco::detectMarkers(channel[2], dictionary, markerCorners, id_m);
-			if(id_m.size()>0) {
-				id=id_m[0]*1000*1000+id_k[0]*1000+id_1[0];
-			}
-			else id=-1;
-		}
-		else id=-1;
-	}
-	else id=-1;
+    vector< int > id_1;
+    vector< int > id_k;
+    vector< int > id_m;
+    vector< vector<Point2f> > markerCorners;
+    cv::aruco::detectMarkers(channel[0], dictionary, markerCorners, id_1);
+    if(id_1.size()>0) {
+        cv::aruco::detectMarkers(channel[1], dictionary, markerCorners, id_k);
+        if(id_k.size()>0) {
+            cv::aruco::detectMarkers(channel[2], dictionary, markerCorners, id_m);
+            if(id_m.size()>0) {
+                id = id_m[0]*1000*1000+id_k[0]*1000+id_1[0];
+            }
+            else id = -1;
+        }
+        else id = -1;
+    }
+    else id = -1;
 
-	return id;	
+    return id;	
 }
 
 
 int main(int argc, char **argv)
 {
-	int id=0;
+    int id = 0;
     ros::init(argc, argv, "read_id");
     ros::NodeHandle nh;
     image_transport::ImageTransport it(nh); 
@@ -109,32 +109,31 @@ int main(int argc, char **argv)
 
     // 接收图像的话题
     imageSubscriber2 = it.subscribe("/camera/rgb/image_id", 1, cameraCallback);
-	//const auto wait_duration = std::chrono::milliseconds(2000)
+    //const auto wait_duration = std::chrono::milliseconds(2000)
 
-	while (ros::ok())
-    	{
-		while (!getImageStatus()) 
-        	{
+    while (ros::ok()){
+
+	    while (!getImageStatus()) {
             printf("Waiting for image.\n");
             //std::this_thread::sleep_for(wait_duration);
             ros::spinOnce();
-        	}
+            }
+        
+        Mat frame;
+            {
+                boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
+                frame = camImageCopy_.clone();
+            }
 
-        	Mat frame;
-        	{
-            boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
-            frame = camImageCopy_.clone();
-        	}
+        id = read_id(frame);
 
-		id=read_id(frame);
-		if(id!=-1)
-			printf("ID=%d\n",id);
-		else
-			printf("failed!\n",id);
+        if(id!=-1)
+            printf("ID=%d\n", id);
+        else
+            printf("failed!\n");
         
         ros::spinOnce();
         loop_rate.sleep();
-
 	}
 		
 }
