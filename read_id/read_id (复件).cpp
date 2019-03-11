@@ -16,7 +16,7 @@ using namespace cv;
 
 
 
-image_transport::Subscriber imageSubscriber_;
+image_transport::Subscriber imageSubscriber2;
 
 int frameWidth_;
 int frameHeight_;
@@ -40,7 +40,7 @@ bool getImageStatus(void)
 
 void cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 {
-    ROS_DEBUG("USB image received.");
+    ROS_DEBUG("IDimage received.");
 
     cv_bridge::CvImagePtr cam_image;
 
@@ -68,65 +68,35 @@ void cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 }
 
 
-
-Mat add_id(int id,Mat frame){
-	cv::Mat markerImage; 
-	vector<Mat> channel(3);
-    cv::aruco::Dictionary dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
-    channel[0]  = cv::Mat::zeros(24, 24, CV_8UC1);
-	channel[1]  = cv::Mat::zeros(24, 24, CV_8UC1);
-	channel[2]  = cv::Mat::zeros(24, 24, CV_8UC1);
-
-	channel[0].setTo(cv::Scalar(255));
-	channel[1].setTo(cv::Scalar(255));
-	channel[2].setTo(cv::Scalar(255));
-    cv::Rect myroi=cv::Rect(4, 4,16,16);
-	cv::Rect idroi=cv::Rect(0, 0,24,24);
-
-	int id_m=id/1000/1000;
-	int id_k=id/1000-id_m*1000;
-	int id_1=id%1000%1000;
-		
-	dictionary.drawMarker(id_1,16, markerImage, 1);
-	markerImage.copyTo(channel[0](myroi));
-
-	dictionary.drawMarker(id_k,16, markerImage, 1);
-	markerImage.copyTo(channel[1](myroi));
-
-	dictionary.drawMarker(id_m,16, markerImage, 1);
-	markerImage.copyTo(channel[2](myroi));
-
-	Mat idmark;
-	merge(channel, idmark);
-	idmark.copyTo(frame(idroi));
-	return frame;
-
-}
-
-
-image_transport::Publisher image_pub;
+int id=0;
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "add_id");
+    ros::init(argc, argv, "read_id");
     ros::NodeHandle nh;
     image_transport::ImageTransport it(nh); 
     ros::Rate loop_rate(30);
 
-    image_pub = it.advertise("/camera/rgb/image_id", 1);
+
     
     // 接收图像的话题
-    imageSubscriber_ = it.subscribe("/camera/rgb/image_raw", 1, cameraCallback);
-	const auto wait_duration = std::chrono::milliseconds(2000);
+    imageSubscriber2 = it.subscribe("/camera/rgb/image_id", 1, cameraCallback);
+	//const auto wait_duration = std::chrono::milliseconds(2000);
 
-	
-	sensor_msgs::ImagePtr idmsg;
-	int id=0;
+	cv::Mat markerImage; 
+	vector<Mat> channel(3);
+    	
+	Ptr<aruco::Dictionary> dictionary = aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
+    
+	Mat idmark;
+	cv::Rect idroi=cv::Rect(0, 0,24,24);
+
+
 	while (ros::ok())
     	{
 		while (!getImageStatus()) 
         	{
             printf("Waiting for image.\n");
-            std::this_thread::sleep_for(wait_duration);
+            //std::this_thread::sleep_for(wait_duration);
             ros::spinOnce();
         	}
 
@@ -136,17 +106,31 @@ int main(int argc, char **argv)
             frame = camImageCopy_.clone();
         	}
 
-		//添加ID到照片左上角
-		frame=add_id(id,frame);
-		// 设置图像帧格式->bgr8
-        idmsg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
-        // 将图像通过话题发布出去
-        image_pub.publish(idmsg); 
-		
-		if( getImageStatus() )  id=id+1;
-		printf("The ID what I have send is=%d\n",id);
-		
-		imshow("add_id", frame);
+		frame(idroi).copyTo(idmark);
+  		split(idmark, channel);
+
+		vector< int > id_1;
+		vector< int > id_k;
+		vector< int > id_m;
+		vector< vector<Point2f> > markerCorners;
+		cv::aruco::detectMarkers(channel[0], dictionary, markerCorners, id_1);
+		if(id_1.size()>0) {
+			cv::aruco::detectMarkers(channel[1], dictionary, markerCorners, id_k);
+			if(id_k.size()>0) {
+				cv::aruco::detectMarkers(channel[2], dictionary, markerCorners, id_m);
+				if(id_m.size()>0) {
+					id=id_m[0]*1000*1000+id_k[0]*1000+id_1[0];
+				printf("sucessed!,ID=%d\n",id);
+				}
+				else printf("failed!\n");
+			}
+			else printf("failed!\n");
+		}
+		else printf("failed!\n");
+		 
+		imshow("id_1", channel[0]);
+		imshow("id_k", channel[1]);
+		imshow("id_m", channel[2]);
        	waitKey(5);
         
         ros::spinOnce();

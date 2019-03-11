@@ -40,7 +40,7 @@ bool getImageStatus(void)
 
 void cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 {
-    ROS_DEBUG("USB image received.");
+    ROS_DEBUG("[EllipseDetector] USB image received.");
 
     cv_bridge::CvImagePtr cam_image;
 
