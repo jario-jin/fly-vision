@@ -14,8 +14,6 @@
 using namespace std;
 using namespace cv;
 
-
-
 image_transport::Subscriber imageSubscriber2;
 
 int frameWidth_;
@@ -33,9 +31,6 @@ bool getImageStatus(void)
     boost::shared_lock<boost::shared_mutex> lock(mutexImageStatus_);
     return imageStatus_;
 }
-
-//! ROS subscriber and publisher.
-
 
 
 void cameraCallback(const sensor_msgs::ImageConstPtr& msg)

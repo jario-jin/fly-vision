@@ -32,6 +32,7 @@ bool getImageStatus(void)
     return imageStatus_;
 }
 
+
 void cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 {
     ROS_DEBUG("USB image received.");
@@ -57,7 +58,6 @@ void cameraCallback(const sensor_msgs::ImageConstPtr& msg)
     }
     return;
 }
-
 
 
 Mat add_id(int id, Mat frame){
