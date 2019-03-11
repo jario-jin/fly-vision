@@ -117,20 +117,18 @@ int main(int argc, char **argv)
 	
 	sensor_msgs::ImagePtr idmsg;
 	int id=0;
-	while (ros::ok())
-    	{
-		while (!getImageStatus()) 
-        	{
-            printf("Waiting for image.\n");
+	while (ros::ok()){
+		while (!getImageStatus()) {
+        	printf("Waiting for image.\n");
             std::this_thread::sleep_for(wait_duration);
             ros::spinOnce();
-        	}
+        }
 
-        	Mat frame;
-        	{
+        Mat frame;
+        {
             boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
             frame = camImageCopy_.clone();
-        	}
+        }
 
 		//添加ID到照片左上角
 		frame=add_id(id,frame);
@@ -147,8 +145,7 @@ int main(int argc, char **argv)
         
         ros::spinOnce();
         loop_rate.sleep();
-
-	}
+    }
 		
 }
 
