@@ -52,8 +52,8 @@ void cameraCallback(const sensor_msgs::ImageConstPtr& msg)
             boost::unique_lock<boost::shared_mutex> lockImageStatus(mutexImageStatus_);
             imageStatus_ = true;
         }
-            frameWidth_ = cam_image->image.size().width;
-            frameHeight_ = cam_image->image.size().height;
+        frameWidth_ = cam_image->image.size().width;
+        frameHeight_ = cam_image->image.size().height;
     }
     return;
 }

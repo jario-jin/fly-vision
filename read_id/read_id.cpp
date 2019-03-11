@@ -112,18 +112,18 @@ int main(int argc, char **argv)
     //const auto wait_duration = std::chrono::milliseconds(2000)
 
     while (ros::ok()){
-
-	    while (!getImageStatus()) {
+        
+        while (!getImageStatus()) {
             printf("Waiting for image.\n");
             //std::this_thread::sleep_for(wait_duration);
-            ros::spinOnce();
+        ros::spinOnce();
             }
         
         Mat frame;
-            {
-                boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
-                frame = camImageCopy_.clone();
-            }
+        {
+            boost::unique_lock<boost::shared_mutex> lockImageCallback(mutexImageCallback_);
+            frame = camImageCopy_.clone();
+        }
 
         id = read_id(frame);
 
