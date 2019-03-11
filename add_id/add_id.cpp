@@ -34,10 +34,6 @@ bool getImageStatus(void)
     return imageStatus_;
 }
 
-//! ROS subscriber and publisher.
-
-
-
 void cameraCallback(const sensor_msgs::ImageConstPtr& msg)
 {
     ROS_DEBUG("USB image received.");
@@ -139,8 +135,8 @@ int main(int argc, char **argv)
 		//添加ID到照片左上角
 		frame=add_id(id,frame);
 		// 设置图像帧格式->bgr8
-        idmsg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
-        // 将图像通过话题发布出去
+    	idmsg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
+       	// 将图像通过话题发布出去
         image_pub.publish(idmsg); 
 		
 		if( getImageStatus() )  id=id+1;
@@ -153,10 +149,6 @@ int main(int argc, char **argv)
         loop_rate.sleep();
 
 	}
-	
-	
+		
 }
-
-
-
 

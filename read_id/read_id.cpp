@@ -95,9 +95,9 @@ int read_id(Mat frame){
 	}
 	else id=-1;
 
-	return id;
-	
+	return id;	
 }
+
 
 int main(int argc, char **argv)
 {
@@ -136,10 +136,6 @@ int main(int argc, char **argv)
         loop_rate.sleep();
 
 	}
-	
-	
+		
 }
-
-
-
 
