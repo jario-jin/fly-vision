@@ -32,6 +32,8 @@ foreach(dir
     timers
     web_cam
     kcf_tracker
+    add_id
+    read_id
     )
   rosflyvision(${dir})
 endforeach()
