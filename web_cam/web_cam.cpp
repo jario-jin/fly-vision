@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 	{
         cap >> frame;
         if (!frame.empty())
-        {
+        {   
             // 设置图像帧格式->bgr8
             msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
             // 将图像通过话题发布出去
