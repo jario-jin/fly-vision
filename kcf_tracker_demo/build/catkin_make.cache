@@ -1,0 +1,2 @@
+
+-DCATKIN_DEVEL_PREFIX=/home/wenxiao/catkin_ws/src/fly-vision/kcf_tracker/devel -DCMAKE_INSTALL_PREFIX=/home/wenxiao/catkin_ws/src/fly-vision/kcf_tracker/install -G Unix Makefiles
