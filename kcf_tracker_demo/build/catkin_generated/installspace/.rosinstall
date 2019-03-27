@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/wenxiao/catkin_ws/src/fly-vision/kcf_tracker/install/setup.sh

@@ -34,6 +34,13 @@ foreach(dir
     kcf_tracker
     add_id
     read_id
+    add_memery
+    read_memery
+    test_memery
+    web_cam_demo
+    kcf_tracker_demo
+    add_memery_demo
+    GroundStation_demo
     )
   rosflyvision(${dir})
 endforeach()
@@ -41,3 +48,22 @@ endforeach()
 add_executable(time_api_sleep time_api/sleep/sleep.cpp)
 target_link_libraries(time_api_sleep ${catkin_LIBRARIES})
 
+target_link_libraries(add_memery
+   ${catkin_LIBRARIES}  -lrt -DBUILD_TESTS=OFF
+ )
+
+target_link_libraries(read_memery
+   ${catkin_LIBRARIES}  -lrt -DBUILD_TESTS=OFF
+ )
+
+target_link_libraries(test_memery
+   ${catkin_LIBRARIES}  -lrt -DBUILD_TESTS=OFF
+ )
+
+target_link_libraries(add_memery_demo
+   ${catkin_LIBRARIES}  -lrt -DBUILD_TESTS=OFF
+ )
+
+target_link_libraries(kcf_tracker_demo
+   ${catkin_LIBRARIES}  -lrt -DBUILD_TESTS=OFF
+ )
